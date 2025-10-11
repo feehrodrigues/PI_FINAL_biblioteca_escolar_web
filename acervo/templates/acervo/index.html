@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca Escolar</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header>
+    <h1>📚 Biblioteca Escolar Web</h1>
+  </header>
+
+  <main>
+  <h2>Buscar Livros</h2>
+
+  <form method="GET" action="">
+      <input type="text" name="q" placeholder="Digite o título ou autor">
+      <button type="submit">Buscar</button>
+  </form>
+
+  {% if livros %}
+      <h3>Resultados:</h3>
+      <ul>
+          {% for livro in livros %}
+              <li><strong>{{ livro.titulo }}</strong> — {{ livro.autor }} ({{ livro.genero }})</li>
+          {% endfor %}
+      </ul>
+  {% elif request.GET.q %}
+      <p>Nenhum livro encontrado.</p>
+  {% endif %}
+</main>
