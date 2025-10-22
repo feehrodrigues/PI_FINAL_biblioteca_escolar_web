@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ livro.titulo }}{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+  <div class="col-md-8 offset-md-2">
+    <div class="card shadow-lg">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Detalhes do Livro</h2>
+      </div>
+      <div class="card-body">
+        <h1 class="card-title">{{ livro.titulo }}</h1>
+        <h4 class="card-subtitle mb-3 text-muted">por {{ livro.autor }}</h4>
+        
+        <p class="fs-5"><strong>Gênero:</strong> {{ livro.genero }}</p>
+        <p class="fs-5"><strong>Ano de Publicação:</strong> {{ livro.ano_publicacao }}</p>
+
+<div class="mt-3">
+          {% if user.is_authenticated %}
+            {% if emprestimo_ativo %}
+              <div class="alert alert-warning" role="alert">
+                <strong>Indisponível!</strong> Este livro foi emprestado por {{ emprestimo_ativo.usuario.username }} e a data de devolução é {{ emprestimo_ativo.data_devolucao|date:"d/m/Y" }}.
+              </div>
+            {% else %}
+              <a href="{% url 'emprestar_livro' livro.id %}" class="btn btn-success btn-lg">Pegar Emprestado</a>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-info" role="alert">
+              <a href="{% url 'login' %}?next={{ request.path }}">Faça login</a> para pegar este livro emprestado.
+            </div>
+          {% endif %}
+        </div>
+                
+      </div>
+      <div class="card-footer text-muted">
+        <a href="{% url 'index' %}" class="btn btn-secondary">← Voltar para o Acervo</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

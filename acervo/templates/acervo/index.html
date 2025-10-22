@@ -1,33 +1,69 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca Escolar</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-  <header>
-    <h1>📚 Biblioteca Escolar Web</h1>
-  </header>
 
-  <main>
-  <h2>Buscar Livros</h2>
+{% block title %}Acervo de Livros - Biblioteca Escolar{% endblock %}
 
-  <form method="GET" action="">
-      <input type="text" name="q" placeholder="Digite o título ou autor">
-      <button type="submit">Buscar</button>
-  </form>
+{% block content %}
 
+<div class="row">
+  <div class="col-12 text-center my-4">
+    <h1 class="display-5">Bem-vindo ao Acervo da Biblioteca!</h1>
+    <p class="lead">Consulte os livros disponíveis e boa leitura.</p>
+  </div>
+</div>
+
+<!-- Barra de Busca -->
+<div class="row justify-content-center mb-5">
+  <div class="col-md-8">
+    <form method="GET" action="{% url 'index' %}" class="d-flex">
+      <input class="form-control me-2" type="search" name="q" placeholder="Buscar por título ou autor..." value="{{ termo_busca }}">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Resultados -->
+<div class="row">
   {% if livros %}
-      <h3>Resultados:</h3>
-      <ul>
-          {% for livro in livros %}
-              <li><strong>{{ livro.titulo }}</strong> — {{ livro.autor }} ({{ livro.genero }})</li>
-          {% endfor %}
-      </ul>
-  {% elif request.GET.q %}
-      <p>Nenhum livro encontrado.</p>
+    {% for livro in livros %}
+      <div class="col-md-4 col-lg-3 mb-4">
+        <!-- Apenas um card, envolvido pelo link -->
+        <a href="{% url 'detalhe_livro' livro.id %}" class="text-decoration-none">
+          <div class="card h-100 shadow-sm card-hover">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-primary">{{ livro.titulo }}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">{{ livro.autor }}</h6>
+              <div class="mt-auto pt-2">
+                  <span class="badge bg-secondary">{{ livro.genero }}</span>
+                  <span class="badge bg-info text-dark">{{ livro.ano_publicacao }}</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="col-12">
+      <div class="alert alert-warning text-center" role="alert">
+        {% if termo_busca %}
+          Nenhum livro encontrado para a busca: <strong>"{{ termo_busca }}"</strong>
+        {% else %}
+          Ainda não há livros cadastrados no acervo.
+        {% endif %}
+      </div>
+    </div>
   {% endif %}
-</main>
+</div>
+
+<!-- Estilos para o efeito "hover" nos cards -->
+<style>
+  .card-hover {
+    transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+  }
+  .card-hover:hover {
+    transform: scale(1.03);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+  }
+</style>
+
+{% endblock %}

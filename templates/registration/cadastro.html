@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro - Biblioteca Escolar{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h2>Crie sua Conta</h2>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          {% if form.errors %}
+            <div class="alert alert-danger">
+              Por favor, corrija os erros abaixo.
+            </div>
+          {% endif %}
+
+          {{ form.as_p }}
+
+          <button type="submit" class="btn btn-success w-100 mt-3">Cadastrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
