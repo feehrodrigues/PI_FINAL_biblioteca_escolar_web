@@ -7,10 +7,14 @@ class Livro(models.Model):
     # Adicionamos 'verbose_name' para cada campo
     titulo = models.CharField(max_length=200, verbose_name="Título")
     autor = models.CharField(max_length=100, verbose_name="Autor")
-    genero = models.CharField(max_length=50, verbose_name="Gênero")
+    genero = models.CharField(max_length=50, verbose_name="Gênero", blank=True)
     ano_publicacao = models.IntegerField(verbose_name="Ano de Publicação")
-    
     disponivel = models.BooleanField(default=True)
+    capa_url = models.URLField(max_length=500, blank=True, null=True)
+    ano_publicacao = models.IntegerField(blank=True, null=True)
+    sinopse = models.TextField(blank=True, null=True)
+
+
 
     # Meta classe para dar um nome amigável ao modelo no plural e singular
     class Meta:

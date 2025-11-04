@@ -137,3 +137,42 @@ body.high-contrast {
 #tts-player .btn {
   min-width: 120px; /* Garante que os botões tenham um tamanho consistente */
 }
+
+/* --- Estilos para a Página de Detalhes do Livro --- */
+.book-cover {
+  max-height: 500px;
+  width: auto;
+  max-width: 100%;
+}
+
+.book-cover-placeholder {
+  height: 500px;
+  width: 100%;
+  max-width: 330px; /* Largura média de um livro */
+  border: 2px dashed #dee2e6;
+  background-color: #f8f9fa;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Estilos para Cartões Clicáveis e Interativos --- */
+
+/* Remove a decoração padrão do link que envolve o cartão */
+.card-link-wrapper {
+  color: inherit; /* Herda a cor do texto do pai */
+  text-decoration: none; /* Remove o sublinhado */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Faz o link ocupar o espaço vertical disponível */
+}
+
+/* Renomeia o efeito de hover para uma classe mais específica */
+.card.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+}
+
+/* Garante que os títulos dentro do link não mudem de cor no hover */
+.card-link-wrapper:hover .card-title {
+  color: #1a73e8; /* Adiciona um destaque azul sutil ao título no hover */
+}

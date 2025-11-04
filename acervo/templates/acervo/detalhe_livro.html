@@ -3,33 +3,59 @@
 {% block title %}{{ livro.titulo }}{% endblock %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-md-8 offset-md-2">
-      <div class="card">
-        <div class="card-body">
-          <h1 class="card-title">{{ livro.titulo }}</h1>
-          <h5 class="card-subtitle mb-3 text-muted">por {{ livro.autor }}</h5>
-          
-          <p class="card-text fs-5" style="white-space: pre-wrap;">{{ livro.sinopse }}</p>
-          
-          <hr>
-          <div class="mt-4">
-            {% if user.is_authenticated %}
-              {% if livro.disponivel %}
-                <a href="{% url 'emprestar_livro' livro.id %}" class="btn btn-success btn-lg">Quero Pegar Emprestado</a>
-              {% else %}
-                <p class="alert alert-danger">Este livro não está disponível no momento.</p>
-              {% endif %}
-            {% else %}
-              <p class="alert alert-info">
-                <a href="{% url 'login' %}?next={{ request.path }}">Faça login</a> para pegar este livro emprestado.
-              </p>
-            {% endif %}
-            
-            <a href="{% url 'index' %}" class="btn btn-secondary mt-3">Voltar ao Catálogo</a>
-          </div>
-        </div>
+<div class="row">
+  <!-- Coluna da Esquerda: Capa do Livro -->
+  <div class="col-md-4 text-center text-md-start mb-4 mb-md-0">
+    {% if livro.capa_url %}
+      <img src="{{ livro.capa_url }}" class="img-fluid rounded shadow-lg book-cover" alt="Capa de {{ livro.titulo }}">
+    {% else %}
+      <div class="img-fluid rounded shadow-lg book-cover-placeholder d-flex align-items-center justify-content-center">
+        <span class="text-muted">Sem capa disponível</span>
       </div>
+    {% endif %}
+  </div>
+
+  <!-- Coluna da Direita: Informações e Ações -->
+  <div class="col-md-8">
+    <h1 class="display-5 fw-bold">{{ livro.titulo }}</h1>
+    <h4 class="text-muted mb-3">{{ livro.autor }}</h4>
+    
+    <!-- Metadados (Ano de Publicação) -->
+    <div class="mb-4">
+      {% if livro.ano_publicacao %}
+        <span class="badge bg-secondary me-2 p-2">Publicado em: {{ livro.ano_publicacao }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Sinopse -->
+    <h5 class="fw-bold">Sinopse</h5>
+    <p class="lead">
+      {% if livro.sinopse %}
+        {{ livro.sinopse }}
+      {% else %}
+        <span class="text-muted fst-italic">Nenhuma sinopse fornecida.</span>
+      {% endif %}
+    </p>
+
+    <hr class="my-4">
+
+    <!-- Botões de Ação -->
+    <div class="d-flex gap-2">
+      {% if user.is_authenticated %}
+        {% if livro.id in livros_emprestados_ids %}
+            <button class="btn btn-success btn-lg" disabled><i class="fas fa-check me-2"></i>Você já pegou</button>
+        {% elif livro.disponivel %}
+            <a href="{% url 'emprestar_livro' livro.id %}" class="btn btn-primary btn-lg"><i class="fas fa-book-reader me-2"></i>Pegar Emprestado</a>
+        {% else %}
+            <button class="btn btn-danger btn-lg" disabled><i class="fas fa-times-circle me-2"></i>Indisponível</button>
+        {% endif %}
+      {% else %}
+        <p class="alert alert-info w-100">
+          <a href="{% url 'login' %}?next={{ request.path }}">Faça login</a> para pegar este livro emprestado.
+        </p>
+      {% endif %}
+      <a href="{% url 'index' %}" class="btn btn-outline-secondary btn-lg">Voltar</a>
     </div>
   </div>
+</div>
 {% endblock %}
