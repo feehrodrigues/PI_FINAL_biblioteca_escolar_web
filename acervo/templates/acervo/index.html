@@ -1,69 +1,54 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}Acervo de Livros - Biblioteca Escolar{% endblock %}
+{% block title %}Catálogo de Livros{% endblock %}
 
 {% block content %}
-
-<div class="row">
-  <div class="col-12 text-center my-4">
-    <h1 class="display-5">Bem-vindo ao Acervo da Biblioteca!</h1>
-    <p class="lead">Consulte os livros disponíveis e boa leitura.</p>
+  <div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+      <h1 class="text-center mb-4">📚 Catálogo de Livros</h1>
+      
+      <form method="get" action="{% url 'index' %}">
+        <div class="input-group">
+          <input type="text" class="form-control" name="q" placeholder="Buscar por título ou autor..." value="{{ termo_busca }}">
+          <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
-<!-- Barra de Busca -->
-<div class="row justify-content-center mb-5">
-  <div class="col-md-8">
-    <form method="GET" action="{% url 'index' %}" class="d-flex">
-      <input class="form-control me-2" type="search" name="q" placeholder="Buscar por título ou autor..." value="{{ termo_busca }}">
-      <button class="btn btn-primary" type="submit">Buscar</button>
-    </form>
-  </div>
-</div>
-
-<!-- Resultados -->
-<div class="row">
-  {% if livros %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
     {% for livro in livros %}
-      <div class="col-md-4 col-lg-3 mb-4">
-        <!-- Apenas um card, envolvido pelo link -->
-        <a href="{% url 'detalhe_livro' livro.id %}" class="text-decoration-none">
-          <div class="card h-100 shadow-sm card-hover">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title text-primary">{{ livro.titulo }}</h5>
-              <h6 class="card-subtitle mb-2 text-muted">{{ livro.autor }}</h6>
-              <div class="mt-auto pt-2">
-                  <span class="badge bg-secondary">{{ livro.genero }}</span>
-                  <span class="badge bg-info text-dark">{{ livro.ano_publicacao }}</span>
-              </div>
-            </div>
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ livro.titulo }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ livro.autor }}</h6>
+            <p class="card-text flex-grow-1">{{ livro.sinopse|truncatewords:20 }}</p>
+            
+            <div class="mt-auto d-flex justify-content-between align-items-center pt-3">
+  
+  <a href="{% url 'detalhe_livro' livro.id %}" class="btn btn-outline-secondary btn-sm">Detalhes</a>
+  
+  {% if user.is_authenticated %}
+     {% if livro.id in livros_emprestados_ids %}
+      <button class="btn btn-success btn-sm" disabled>Você já pegou</button>
+    {% elif livro.disponivel %}
+      <a href="{% url 'emprestar_livro' livro.id %}" class="btn btn-primary btn-sm">Pegar Emprestado</a>
+    {% else %}
+      <button class="btn btn-outline-danger btn-sm" disabled>Indisponível</button>
+    {% endif %}
+  {% endif %}
+  
+</div>
           </div>
-        </a>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-warning text-center">
+          Nenhum livro encontrado.
+        </div>
       </div>
     {% endfor %}
-  {% else %}
-    <div class="col-12">
-      <div class="alert alert-warning text-center" role="alert">
-        {% if termo_busca %}
-          Nenhum livro encontrado para a busca: <strong>"{{ termo_busca }}"</strong>
-        {% else %}
-          Ainda não há livros cadastrados no acervo.
-        {% endif %}
-      </div>
-    </div>
-  {% endif %}
-</div>
-
-<!-- Estilos para o efeito "hover" nos cards -->
-<style>
-  .card-hover {
-    transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
-  }
-  .card-hover:hover {
-    transform: scale(1.03);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-  }
-</style>
-
+  </div>
 {% endblock %}

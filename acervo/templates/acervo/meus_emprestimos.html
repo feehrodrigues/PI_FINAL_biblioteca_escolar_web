@@ -3,38 +3,30 @@
 {% block title %}Meus Empréstimos{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h1 class="mb-4">Meus Empréstimos</h1>
+  <div class="col-md-10 mx-auto">
+    <h1 class="mb-4">Meus Livros Emprestados</h1>
 
-  {% if emprestimos %}
-    <div class="list-group">
-      {% for emprestimo in emprestimos %}
-        <div class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <h5 class="mb-1">{{ emprestimo.livro.titulo }}</h5>
-            <small>Emprestado em: {{ emprestimo.data_emprestimo|date:"d/m/Y" }} | Devolver até: {{ emprestimo.data_devolucao|date:"d/m/Y" }}</small>
-          </div>
-          <div>
-            {% if emprestimo.devolvido %}
-              <span class="badge bg-secondary rounded-pill">Devolvido</span>
-            {% else %}
-                <form method="POST" action="{% url 'devolver_livro' emprestimo.id %}" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-warning btn-sm">Devolver</button>
-              </form>
-            {% endif %}
-          </div>
-        </div>
+    {% if emprestimos %}
+      <div class="list-group">
+        {% for emprestimo in emprestimos %}
+          <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="mb-1">{{ emprestimo.livro.titulo }}</h5>
+              <p class="mb-1 text-muted">por {{ emprestimo.livro.autor }}</p>
+              <small>Emprestado em: {{ emprestimo.data_emprestimo|date:"d/m/Y" }}</small>
+            </div>
             
-            
-     </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="alert alert-info" role="alert">
-      Você ainda não pegou nenhum livro emprestado. Explore nosso <a href="{% url 'index' %}" class="alert-link">acervo</a>!
-    </div>
-  {% endif %}
-</div>
+            <!-- Botão de Devolução -->
+            <a href="{% url 'devolver_livro' emprestimo.id %}" class="btn btn-warning">Devolver</a>
+
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-info text-center">
+        <p class="mb-0">Você não possui livros emprestados no momento.</p>
+        <a href="{% url 'index' %}" class="alert-link mt-2 d-block">Ver o catálogo de livros</a>
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}

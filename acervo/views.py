@@ -1,83 +1,103 @@
-from django.shortcuts import render, get_object_or_404 
-from django.shortcuts import render
-from django.contrib.auth.forms import UserCreationForm
+# ARQUIVO: acervo/views.py
+
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Livro
+from django.urls import reverse_lazy
+from django.views import generic
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Livro, Emprestimo
 
 def index(request):
-    termo_busca = request.GET.get('q')
-
+    termo_busca = request.GET.get('q', '')
     if termo_busca:
-        # Se há um termo de busca, filtra os livros
         livros = Livro.objects.filter(titulo__icontains=termo_busca) | Livro.objects.filter(autor__icontains=termo_busca)
     else:
-        # Se não há busca, lista todos os livros, ordenados por título
         livros = Livro.objects.all().order_by('titulo')
-
-    # O contexto sempre terá a variável 'livros', mesmo que a busca não retorne nada
-    contexto = {
-        'livros': livros,
-        'termo_busca': termo_busca or '' # Garante que termo_busca nunca seja None no template
-    }
     
+    # --- NOVA LÓGICA PARA O TEMPLATE ---
+    livros_emprestados_pelo_usuario_ids = []
+    if request.user.is_authenticated:
+        livros_emprestados_pelo_usuario_ids = Emprestimo.objects.filter(usuario=request.user).values_list('livro__id', flat=True)
+
+    contexto = {
+        'livros': livros, 
+        'termo_busca': termo_busca,
+        'livros_emprestados_ids': livros_emprestados_pelo_usuario_ids # Passa a lista de IDs para o template
+    }
+    return render(request, 'acervo/index.html', contexto)
+    
+    contexto = {'livros': livros, 'termo_busca': termo_busca}
     return render(request, 'acervo/index.html', contexto)
 
 def detalhe_livro(request, livro_id):
     livro = get_object_or_404(Livro, pk=livro_id)
-    
-    # Verifica se existe um empréstimo ativo (não devolvido) para este livro
-    emprestimo_ativo = Emprestimo.objects.filter(livro=livro, devolvido=False).first()
-    
-    contexto = {
-        'livro': livro,
-        'emprestimo_ativo': emprestimo_ativo
-    }
-    return render(request, 'acervo/detalhe_livro.html', contexto)
-
-def cadastro(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save() # Cria o usuário no banco de dados
-            return redirect('login') # Redireciona para a página de login
-    else:
-        form = UserCreationForm()
-        
-    return render(request, 'registration/cadastro.html', {'form': form})
-
-@login_required
-def emprestar_livro(request, livro_id):
-    livro = get_object_or_404(Livro, pk=livro_id)
-    
-    # Verifica novamente se o livro já não foi emprestado enquanto o usuário olhava a página
-    if Emprestimo.objects.filter(livro=livro, devolvido=False).exists():
-        # Idealmente, aqui mostraríamos uma mensagem de erro. Por enquanto, redirecionamos.
-        return redirect('detalhe_livro', livro_id=livro.id)
-
-    # Cria o novo empréstimo
-    Emprestimo.objects.create(livro=livro, usuario=request.user)
-    
-    return redirect('detalhe_livro', livro_id=livro.id)
+    return render(request, 'acervo/detalhe_livro.html', {'livro': livro})
 
 @login_required
 def meus_emprestimos(request):
-    # Busca todos os empréstimos associados ao usuário logado
-    # e ordena pelos mais recentes primeiro
-    emprestimos = Emprestimo.objects.filter(usuario=request.user).order_by('-data_emprestimo')
-    
-    contexto = {
-        'emprestimos': emprestimos
-    }
-    return render(request, 'acervo/meus_emprestimos.html', contexto)
+    emprestimos = Emprestimo.objects.filter(usuario=request.user)
+    return render(request, 'acervo/meus_emprestimos.html', {'emprestimos': emprestimos})
+
+@login_required
+def emprestar_livro(request, livro_id):
+    livro = get_object_or_404(Livro, id=livro_id)
+    LIMITE_EMPRESTIMOS = 3
+
+    # --- VERIFICAÇÕES NA ORDEM CORRETA E SEGURA ---
+
+    # 1. (MAIS IMPORTANTE) O livro está fisicamente disponível na biblioteca?
+    if not livro.disponivel:
+        messages.error(request, 'Operação falhou: este livro já foi emprestado por outra pessoa.')
+        return redirect('index')
+
+    # 2. O usuário atual já está com este mesmo livro?
+    usuario_ja_pegou = Emprestimo.objects.filter(usuario=request.user, livro=livro).exists()
+    if usuario_ja_pegou:
+        messages.warning(request, 'Você já está com este livro emprestado.')
+        return redirect('index')
+
+    # 3. O usuário atual atingiu seu limite pessoal de empréstimos?
+    emprestimos_ativos = Emprestimo.objects.filter(usuario=request.user).count()
+    if emprestimos_ativos >= LIMITE_EMPRESTIMOS:
+        messages.warning(request, f'Você atingiu seu limite de {LIMITE_EMPRESTIMOS} livros emprestados.')
+        return redirect('index')
+
+    # --- Se todas as regras passarem, o empréstimo é realizado ---
+    Emprestimo.objects.create(usuario=request.user, livro=livro)
+    livro.disponivel = False  # AGORA o livro é marcado como indisponível
+    livro.save()
+    messages.success(request, f'Você pegou "{livro.titulo}" emprestado com sucesso!')
+    return redirect('index')
 
 @login_required
 def devolver_livro(request, emprestimo_id):
-    emprestimo = get_object_or_404(Emprestimo, pk=emprestimo_id, usuario=request.user)
+    # Procura um empréstimo que pertença ao usuário logado para segurança
+    emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id, usuario=request.user)
     
-    if request.method == 'POST':
-        emprestimo.devolvido = True
-        emprestimo.save()
-        
+    livro_titulo = emprestimo.livro.titulo
+    
+    # Atualiza o status do livro para disponível
+    emprestimo.livro.disponivel = True
+    emprestimo.livro.save()
+    
+    # Remove o registro do empréstimo
+    emprestimo.delete()
+    
+    # Envia a notificação de sucesso
+    messages.success(request, f'Você devolveu "{livro_titulo}" com sucesso!')
+    
+    # Redireciona de volta para a lista de empréstimos
     return redirect('meus_emprestimos')
+
+class CadastroView(generic.CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy('index')
+    template_name = 'registration/cadastro.html'
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, self.object)
+        messages.success(self.request, f'Bem-vindo(a), {self.object.username}! Cadastro realizado com sucesso.')
+        return response

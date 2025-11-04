@@ -9,6 +9,8 @@ class Livro(models.Model):
     autor = models.CharField(max_length=100, verbose_name="Autor")
     genero = models.CharField(max_length=50, verbose_name="Gênero")
     ano_publicacao = models.IntegerField(verbose_name="Ano de Publicação")
+    
+    disponivel = models.BooleanField(default=True)
 
     # Meta classe para dar um nome amigável ao modelo no plural e singular
     class Meta:
