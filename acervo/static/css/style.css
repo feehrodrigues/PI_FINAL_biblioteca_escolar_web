@@ -176,3 +176,82 @@ body.high-contrast {
 .card-link-wrapper:hover .card-title {
   color: #1a73e8; /* Adiciona um destaque azul sutil ao título no hover */
 }
+
+/* ================================================= */
+/*          MODO DE ALTO CONTRASTE (VERSÃO MELHORADA)          */
+/* ================================================= */
+
+/* Quando a classe .high-contrast é aplicada no body */
+body.high-contrast {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+/* --- TEXTOS GERAIS --- */
+.high-contrast h1,
+.high-contrast h2,
+.high-contrast h3,
+.high-contrast p,
+.high-contrast span,
+.high-contrast li,
+.high-contrast label,
+.high-contrast .navbar-text,
+.high-contrast .text-muted,
+.high-contrast .card-subtitle {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+/* --- LINKS --- */
+.high-contrast a, .high-contrast .navbar-brand {
+  color: #FFFF00 !important; /* Amarelo para destaque máximo */
+  text-decoration: underline !important;
+}
+
+/* --- CONTAINERS E SEÇÕES (Cards, Navbar, Footer) --- */
+.high-contrast .card,
+.high-contrast .navbar,
+.high-contrast footer,
+.high-contrast .card-header,
+.high-contrast .card-body,
+.high-contrast .card-footer,
+.high-contrast .alert {
+  background-color: #000 !important;
+  color: #fff !important;
+  border: 1px solid #fff !important; /* Borda para delimitar os elementos */
+}
+
+/* --- BOTÕES E FORMULÁRIOS --- */
+.high-contrast .btn,
+.high-contrast button,
+.high-contrast input,
+.high-contrast textarea,
+.high-contrast select,
+.high-contrast .form-control {
+  background-color: #000 !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+}
+
+/* Ajuste específico para os botões da navbar de acessibilidade */
+.high-contrast .nav-action-btn {
+    color: #fff !important;
+    border: 1px solid transparent; /* Remove a borda padrão se houver */
+}
+.high-contrast .nav-action-btn:hover {
+    background-color: #333 !important;
+    border-color: #fff;
+}
+
+/* Remove sombras que não fazem sentido no alto contraste */
+.high-contrast .shadow,
+.high-contrast .shadow-sm {
+  box-shadow: none !important;
+}
+
+/* Ajusta as cores de fundo do Bootstrap (bg-primary, etc) */
+.high-contrast .bg-primary,
+.high-contrast .bg-success,
+.high-contrast .bg-light {
+    background-color: #000 !important;
+}
