@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Biblioteca Escolar{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h2>Login</h2>
+      </div>
+      <div class="card-body">
+        {% if form.errors %}
+          <div class="alert alert-danger" role="alert">
+            Seu nome de usuário e senha não correspondem. Por favor, tente novamente.
+          </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="id_username" class="form-label">Nome de usuário:</label>
+            <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" class="form-control" required id="id_username">
+          </div>
+          
+          <div class="mb-3">
+            <label for="id_password" class="form-label">Senha:</label>
+            <input type="password" name="password" autocomplete="current-password" class="form-control" required id="id_password">
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
+      </div>
+      <div class="card-footer text-center">
+        <a href="{% url 'cadastro' %}">Não tem uma conta? Cadastre-se</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
