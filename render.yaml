@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: biblioteca
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn biblioteca.wsgi:application --bind 0.0.0.0:$PORT"
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: banco_biblioteca
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true # Render will generate a random SECRET_KEY
+      - key: DEBUG
+        value: "False" # Set to "True" for debugging, but "False" for production
+      - key: WEB_CONCURRENCY
+        value: 4 # Adjust based on your instance type
+  - type: postgres
+    name: dbbiblioteca
+    plan: free # ou starter, standard, etc.

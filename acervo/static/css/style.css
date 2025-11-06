@@ -1,46 +1,257 @@
+/* ARQUIVO: acervo/static/css/style.css */
+
+/* --- Estilo Geral e Tipografia Padrão Google --- */
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background-color: #f6f6f6;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8f9fa; /* Um cinza muito claro, padrão em apps web */
 }
 
-header {
-  background-color: #004080;
-  color: white;
-  padding: 15px;
-  text-align: center;
-}
-form {
-  margin: 20px 0;
+/* --- Barra de Navegação (Navbar) --- */
+
+/* --- Estilo Elegante para a Barra de Navegação --- */
+.navbar.bg-white {
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
-input[type="text"] {
-  padding: 10px;
-  width: 60%;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.navbar-brand {
+  font-weight: 500;
+  color: #3c4043 !important; /* Cinza escuro do Google */
 }
 
-button {
-  padding: 10px 15px;
-  background-color: #004080;
-  color: white;
+/* Estilo para os labels de acessibilidade (A+, A-) */
+.nav-label {
+  color: #5f6368;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Estilo para os botões de ícone (acessibilidade) */
+.nav-action-btn {
+  background-color: transparent;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #5f6368; /* Cinza médio do Google para ícones */
+  width: 36px;
+  height: 36px;
+  border-radius: 50%; /* Botões perfeitamente redondos */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease-in-out;
 }
 
-button:hover {
-  background-color: #003366;
+.nav-action-btn:hover {
+  background-color: #f1f3f4; /* Fundo cinza claro no hover */
+  color: #202124;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+.navbar .btn {
+  border-radius: 20px; /* Botões em formato de pílula */
+  font-weight: 500;
 }
 
-li {
-  padding: 5px 0;
-  border-bottom: 1px solid #ddd;
+
+/* --- Cartões de Livro (Cards) --- */
+.card {
+  border: none; /* Remove a borda padrão */
+  border-radius: 12px; /* Cantos mais arredondados */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave para dar profundidade */
+  transition: all 0.2s ease-in-out;
+}
+.card:hover {
+  transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+}
+
+/* --- Botões --- */
+.btn {
+  border-radius: 8px; /* Cantos arredondados nos botões */
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+.btn-primary {
+    background-color: #1a73e8; /* Azul clássico do Google */
+    border-color: #1a73e8;
+}
+.btn-primary:hover {
+    background-color: #186bd6;
+    border-color: #186bd6;
+}
+
+/* --- Formulários (Barra de Busca) --- */
+.form-control {
+    border-radius: 8px;
+}
+.form-control:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 0.25rem rgba(26, 115, 232, 0.25);
+}
+
+/* --- Mantém a funcionalidade de Alto Contraste --- */
+/* (Esta parte permanece a mesma) */
+body.high-contrast {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+.high-contrast .card,
+.high-contrast .alert,
+.high-contrast .list-group-item {
+  background-color: #111 !important;
+  border: 1px solid #fff;
+  color: #fff;
+}
+.high-contrast .card-subtitle,
+.high-contrast .text-muted {
+  color: #ccc !important;
+}
+.high-contrast a {
+  color: #ffff00 !important;
+}
+.high-contrast .btn-primary, .high-contrast .bg-primary {
+  background-color: #000 !important;
+  border: 1px solid #fff;
+}
+.high-contrast .btn-secondary {
+    background-color: #333 !important;
+    border-color: #fff;
+}
+.high-contrast footer.bg-light, .high-contrast footer .p-3 {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-top: 1px solid #fff;
+}
+.high-contrast .navbar-brand {
+    color: #ffff00 !important;
+}
+/* Corrige a navbar no modo de alto contraste */
+.high-contrast .navbar.bg-primary {
+    background-color: #000 !important;
+    border-bottom: 1px solid #fff;
+}
+.high-contrast .navbar .btn-outline-light {
+    color: #fff;
+    border-color: #fff;
+}
+
+/* --- Estilos para o Player de Leitura (TTS) --- */
+#tts-player .btn {
+  min-width: 120px; /* Garante que os botões tenham um tamanho consistente */
+}
+
+/* --- Estilos para a Página de Detalhes do Livro --- */
+.book-cover {
+  max-height: 500px;
+  width: auto;
+  max-width: 100%;
+}
+
+.book-cover-placeholder {
+  height: 500px;
+  width: 100%;
+  max-width: 330px; /* Largura média de um livro */
+  border: 2px dashed #dee2e6;
+  background-color: #f8f9fa;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Estilos para Cartões Clicáveis e Interativos --- */
+
+/* Remove a decoração padrão do link que envolve o cartão */
+.card-link-wrapper {
+  color: inherit; /* Herda a cor do texto do pai */
+  text-decoration: none; /* Remove o sublinhado */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Faz o link ocupar o espaço vertical disponível */
+}
+
+/* Renomeia o efeito de hover para uma classe mais específica */
+.card.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+}
+
+/* Garante que os títulos dentro do link não mudem de cor no hover */
+.card-link-wrapper:hover .card-title {
+  color: #1a73e8; /* Adiciona um destaque azul sutil ao título no hover */
+}
+
+/* ================================================= */
+/*          MODO DE ALTO CONTRASTE (VERSÃO MELHORADA)          */
+/* ================================================= */
+
+/* Quando a classe .high-contrast é aplicada no body */
+body.high-contrast {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+/* --- TEXTOS GERAIS --- */
+.high-contrast h1,
+.high-contrast h2,
+.high-contrast h3,
+.high-contrast p,
+.high-contrast span,
+.high-contrast li,
+.high-contrast label,
+.high-contrast .navbar-text,
+.high-contrast .text-muted,
+.high-contrast .card-subtitle {
+  background-color: transparent !important;
+  color: #fff !important;
+}
+
+/* --- LINKS --- */
+.high-contrast a, .high-contrast .navbar-brand {
+  color: #FFFF00 !important; /* Amarelo para destaque máximo */
+  text-decoration: underline !important;
+}
+
+/* --- CONTAINERS E SEÇÕES (Cards, Navbar, Footer) --- */
+.high-contrast .card,
+.high-contrast .navbar,
+.high-contrast footer,
+.high-contrast .card-header,
+.high-contrast .card-body,
+.high-contrast .card-footer,
+.high-contrast .alert {
+  background-color: #000 !important;
+  color: #fff !important;
+  border: 1px solid #fff !important; /* Borda para delimitar os elementos */
+}
+
+/* --- BOTÕES E FORMULÁRIOS --- */
+.high-contrast .btn,
+.high-contrast button,
+.high-contrast input,
+.high-contrast textarea,
+.high-contrast select,
+.high-contrast .form-control {
+  background-color: #000 !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+}
+
+/* Ajuste específico para os botões da navbar de acessibilidade */
+.high-contrast .nav-action-btn {
+    color: #fff !important;
+    border: 1px solid transparent; /* Remove a borda padrão se houver */
+}
+.high-contrast .nav-action-btn:hover {
+    background-color: #333 !important;
+    border-color: #fff;
+}
+
+/* Remove sombras que não fazem sentido no alto contraste */
+.high-contrast .shadow,
+.high-contrast .shadow-sm {
+  box-shadow: none !important;
+}
+
+/* Ajusta as cores de fundo do Bootstrap (bg-primary, etc) */
+.high-contrast .bg-primary,
+.high-contrast .bg-success,
+.high-contrast .bg-light {
+    background-color: #000 !important;
 }
