@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ livro.titulo }} | Biblioteca Inteligente</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=5">
+</head>
+<body class="transition-tema">
+
+  <nav class="navbar navbar-expand-lg py-3 shadow-sm bg-white">
+    <div class="container">
+      <a class="navbar-brand fw-bolder logo-text" href="{% url 'index' %}">EMEF Gianfrancesco Guarnieri</a>
+    </div>
+  </nav>
+
+  <main class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card card-premium border-0 shadow-sm p-5">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="badge bg-soft-orange text-orange px-3 py-2 rounded-pill fs-6">{{ livro.genero }}</span>
+            <a href="{% url 'index' %}" class="btn btn-light rounded-pill">← Voltar ao Acervo</a>
+          </div>
+
+          <h1 class="display-5 fw-bold mb-2">{{ livro.titulo }}</h1>
+          <p class="fs-4 text-muted">por {{ livro.autor }}</p>
+          
+          <hr class="my-4">
+          
+          <h5 class="fw-bold">Detalhes da Obra</h5>
+          <ul class="list-unstyled mt-3">
+              <li><strong>Ano de Publicação:</strong> {{ livro.ano_publicacao }}</li>
+              <li><strong>ISBN/Código:</strong> {{ livro.codigo_isbn|default:"Não informado" }}</li>
+          </ul>
+
+          <hr class="my-4">
+
+          <!-- ============================================= -->
+          <!--      NOVA SEÇÃO DE CONTROLE DE EMPRÉSTIMO     -->
+          <!-- ============================================= -->
+          <div>
+            <h5 class="fw-bold mb-3">Status do Livro</h5>
+
+            {% if emprestimo_ativo %}
+              <!-- SE O LIVRO ESTIVER EMPRESTADO -->
+              <div class="alert alert-warning">
+                <p class="mb-1"><strong>Status:</strong> Emprestado</p>
+                <p class="mb-1"><strong>Retirado por:</strong> {{ emprestimo_ativo.usuario.username }}</p>
+                <p class="mb-0"><strong>Devolução até:</strong> {{ emprestimo_ativo.data_devolucao|date:"d/m/Y" }}</p>
+              </div>
+              <form action="{% url 'registrar_devolucao' emprestimo_ativo.id %}" method="POST" class="d-grid">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg">Registrar Devolução</button>
+              </form>
+
+            {% else %}
+              <!-- SE O LIVRO ESTIVER DISPONÍVEL -->
+              <div class="alert alert-success">
+                <p class="mb-0"><strong>Status:</strong> Disponível para empréstimo</p>
+              </div>
+              <form action="{% url 'registrar_emprestimo' livro.id %}" method="POST" class="d-grid">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-lg">Registrar Empréstimo</button>
+              </form>
+            {% endif %}
+
+          </div>
+          <!-- ============================================= -->
+          
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

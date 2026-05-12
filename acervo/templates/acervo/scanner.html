@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanner | Biblioteca Inteligente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=11">
+  <style>
+    body { background-color: var(--bg-color); }
+    #scanner-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: auto;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 3px solid var(--border-light);
+      transition: border-color 0.3s ease;
+    }
+    #scanner-container.success { border-color: #198754; }
+    #scanner-container.error { border-color: #dc3545; }
+
+    #scanner-container video { display: block; width: 100%; height: auto; }
+    #scanner-container .drawingBuffer { display: none; } /* Oculta a linha verde padrão do Quagga */
+    
+    /* Linha de mira visual para o usuário */
+    .laser-line {
+        position: absolute;
+        top: 50%;
+        left: 5%;
+        right: 5%;
+        height: 2px;
+        background-color: rgba(220, 53, 69, 0.8);
+        box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
+        transform: translateY(-50%);
+        border-radius: 2px;
+        animation: scanning 2s infinite ease-in-out;
+    }
+    @keyframes scanning {
+        0%, 100% { top: 20%; }
+        50% { top: 80%; }
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <nav class="navbar navbar-expand-lg py-3 shadow-sm bg-white">
+    <div class="container">
+      <a class="navbar-brand fw-bolder logo-text" href="{% url 'index' %}">EMEF Gianfrancesco Guarnieri</a>
+      <a href="{% url 'index' %}" class="btn btn-outline-secondary rounded-pill btn-sm ms-auto">← Voltar ao Acervo</a>
+    </div>
+  </nav>
+
+  <main class="container my-5 flex-grow-1">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card card-premium border-0 shadow-sm p-4 text-center">
+            <h3 class="fw-bold mb-1">Scanner de Livros</h3>
+            <p class="text-muted small mb-4" id="status-message">Aponte a câmera para o código de barras...</p>
+            
+            <div id="scanner-container" class="mb-3">
+                <div class="laser-line"></div>
+            </div>
+
+            <div id="resultado-feedback" class="mt-2" style="min-height: 50px;">
+                <!-- O feedback vai aparecer aqui -->
+            </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+  <script src="{% static 'js/scanner.js' %}?v=2"></script>
+</body>
+</html>

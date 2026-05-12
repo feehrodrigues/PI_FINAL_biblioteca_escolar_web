@@ -4,30 +4,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca Escolar</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <title>Acervo | EMEF Gianfrancesco Guarnieri</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=7">
 </head>
-<body>
-  <header>
-    <h1>📚 Biblioteca Escolar Web</h1>
+<body class="transition-tema" id="conteudo-principal">
+
+  <nav class="navbar navbar-expand-lg py-3 shadow-sm bg-white">
+    <div class="container">
+      <a class="navbar-brand fw-bolder logo-text" href="{% url 'index' %}">EMEF Gianfrancesco Guarnieri</a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+         <div class="ms-auto d-flex align-items-center gap-3">
+        <a href="{% url 'scanner' %}" class="btn btn-outline-primary rounded-pill btn-sm" aria-label="Escanear código de barras de um livro">📷 Escanear Livro</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary rounded-pill btn-sm" aria-label="Acessar o dashboard analítico">Ver Dashboard</a>
+        <div class="vr"></div>
+        <div class="acessibilidade-panel d-flex gap-2">
+            <!-- BOTÃO CORRIGIDO E DE VOLTA AO LUGAR CERTO -->
+            <button id="btn-contraste" class="btn btn-outline-acessibility rounded-pill btn-sm">🌓 Alto Contraste</button>
+            <button id="btn-leitura" class="btn btn-outline-acessibility rounded-pill btn-sm" aria-label="Ativar leitor de conteúdo">🔊 Ouvir</button>
+            <button id="btn-parar-leitura" class="btn btn-danger rounded-pill btn-sm" style="display: none;">⏹️ Parar</button>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section py-5 mb-5">
+    <div class="container py-4">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <span class="badge bg-soft-orange text-orange mb-3 px-3 py-2 rounded-pill">Plataforma Digital</span>
+          <h1 class="hero-title">Gestão inteligente do <br><span class="text-orange">conhecimento escolar.</span></h1>
+          <p class="hero-subtitle mt-3 mb-4">Explore, pesquise e encontre sua próxima leitura em nosso acervo digital, agora mais acessível e interativo para todos os alunos.</p>
+        </div>
+        <div class="col-lg-6 text-center position-relative">
+            <svg class="img-fluid hero-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" width="100%" height="auto">
+  <!-- Fundo / Elementos de Decoração -->
+  <circle cx="250" cy="200" r="150" fill="#ffedd5" opacity="0.5"/>
+  <path d="M100 350 Q 250 400 400 350" fill="none" stroke="#e2e8f0" stroke-width="4"/>
+  
+  <!-- Livro Base (Aberto) -->
+  <path d="M150 280 L 250 300 L 350 280 L 330 250 L 250 270 L 170 250 Z" fill="#cbd5e1"/>
+  <path d="M150 270 L 250 290 L 350 270 L 330 240 L 250 260 L 170 240 Z" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="250" y1="260" x2="250" y2="290" stroke="#94a3b8" stroke-width="2"/>
+  
+  <!-- Livro do Meio -->
+  <rect x="200" y="180" width="100" height="30" rx="4" fill="#0f172a" transform="rotate(-10 250 195)"/>
+  <rect x="205" y="185" width="90" height="20" rx="2" fill="#ffffff" transform="rotate(-10 250 195)"/>
+  <line x1="220" y1="195" x2="280" y2="195" stroke="#f97316" stroke-width="4" transform="rotate(-10 250 195)"/>
+  
+  <!-- Livro do Topo (Destaque Laranja) -->
+  <rect x="190" y="140" width="120" height="35" rx="5" fill="#f97316" transform="rotate(5 250 157)"/>
+  <rect x="195" y="145" width="110" height="25" rx="3" fill="#ffffff" transform="rotate(5 250 157)"/>
+  <circle cx="250" cy="157" r="8" fill="#f97316" transform="rotate(5 250 157)"/>
+  
+  <!-- Estrelas/Ideias flutuando -->
+  <polygon points="350,100 355,115 370,115 358,125 362,140 350,130 338,140 342,125 330,115 345,115" fill="#f97316" opacity="0.8"/>
+  <polygon points="120,150 123,160 133,160 125,167 128,177 120,170 112,177 115,167 107,160 117,160" fill="#0f172a" opacity="0.6"/>
+</svg>
+        </div>
+      </div>
+    </div>
   </header>
 
-  <main>
-  <h2>Buscar Livros</h2>
+  <main class="container my-5" id="acervo">
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-6">
+        <h3 class="fw-bold mb-0">Catálogo de Livros</h3>
+      </div>
+      <div class="col-md-6">
+        <form method="GET" action="#acervo" class="d-flex search-bar-modern shadow-sm">
+            <input type="text" class="form-control border-0 bg-transparent" name="q" placeholder="Buscar título ou autor..." value="{{ termo_busca|default_if_none:'' }}">
+            <button class="btn btn-search px-4 rounded-pill" type="submit">Buscar</button>
+        </form>
+      </div>
+    </div>
+    <div class="row g-4">
+      {% if livros %}
+        {% for livro in livros %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <a href="{% url 'detalhe_livro' livro.id %}" class="text-decoration-none" aria-label="Ver detalhes sobre o livro {{ livro.titulo }}">
+            <div class="card card-book h-100 border-0 shadow-sm">
+              <div class="card-body"><span class="badge bg-light text-secondary rounded-1">{{ livro.genero }}</span><h5 class="fw-bold text-dark mt-3 mb-1 book-title">{{ livro.titulo }}</h5><p class="text-muted small mb-0">{{ livro.autor }}</p></div>
+              <div class="card-footer bg-transparent border-0 pt-0 pb-3"><span class="text-muted" style="font-size: 0.75rem;">Publicado em {{ livro.ano_publicacao }}</span></div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12 text-center py-5"><div class="p-5 bg-light rounded-4 text-muted"><h5>Nenhum registro encontrado.</h5></div></div>
+      {% endif %}
+    </div>
+  </main>
+  
+  
 
-  <form method="GET" action="">
-      <input type="text" name="q" placeholder="Digite o título ou autor">
-      <button type="submit">Buscar</button>
-  </form>
-
-  {% if livros %}
-      <h3>Resultados:</h3>
-      <ul>
-          {% for livro in livros %}
-              <li><strong>{{ livro.titulo }}</strong> — {{ livro.autor }} ({{ livro.genero }})</li>
-          {% endfor %}
-      </ul>
-  {% elif request.GET.q %}
-      <p>Nenhum livro encontrado.</p>
-  {% endif %}
-</main>
+  <script src="{% static 'js/script.js' %}?v=7"></script>
+</body>
+</html>

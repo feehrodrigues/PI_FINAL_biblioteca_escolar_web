@@ -1,46 +1,111 @@
+:root {
+  --bg-color: #f8fafc;
+  --surface-color: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --brand-highlight: #f97316;
+  --soft-highlight: #ffedd5;
+  --border-light: #e2e8f0;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background-color: #f6f6f6;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color) !important;
+  color: var(--text-main) !important;
+  transition: all 0.3s ease;
 }
 
-header {
-  background-color: #004080;
-  color: white;
-  padding: 15px;
-  text-align: center;
-}
-form {
-  margin: 20px 0;
-}
-
-input[type="text"] {
-  padding: 10px;
-  width: 60%;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+/* ==========================================================
+   MODO ALTO CONTRASTE - REALMENTE ACESSÍVEL
+   ========================================================== */
+body.alto-contraste {
+  --bg-color: #000000;
+  --surface-color: #000000;
+  --text-main: #FFFFFF; /* Texto principal BRANCO para máxima legibilidade */
+  --text-muted: #FFFF00; /* Texto secundário e títulos em AMARELO para diferenciação */
+  --brand-highlight: #00BFFF; /* Azul vibrante (Deep Sky Blue) para links e destaques */
+  --soft-highlight: rgba(0, 191, 255, 0.1);
+  --border-light: #FFFF00; /* Bordas em amarelo para delimitar os espaços */
 }
 
-button {
-  padding: 10px 15px;
-  background-color: #004080;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+/* Regras de Override para o Alto Contraste */
+body.alto-contraste .navbar,
+body.alto-contraste .card,
+body.alto-contraste .search-bar-modern,
+body.alto-contraste .hero-section,
+body.alto-contraste .bg-light {
+    background-color: var(--surface-color) !important;
+    border: 1px solid var(--border-light) !important;
 }
 
-button:hover {
-  background-color: #003366;
+body.alto-contraste .hero-title,
+body.alto-contraste .book-title,
+body.alto-contraste .logo-text,
+body.alto-contraste h1,
+body.alto-contraste h3,
+body.alto-contraste h5,
+body.alto-contraste h6 {
+    color: var(--text-muted) !important; /* Títulos em Amarelo */
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+body.alto-contraste p,
+body.alto-contraste span,
+body.alto-contraste li,
+body.alto-contraste input,
+body.alto-contraste .text-muted {
+    color: var(--text-main) !important; /* Parágrafos e textos gerais em Branco */
 }
 
-li {
-  padding: 5px 0;
-  border-bottom: 1px solid #ddd;
+body.alto-contraste input::placeholder {
+    color: var(--text-main) !important;
+    opacity: 0.8;
 }
+
+
+body.alto-contraste .text-orange,
+body.alto-contraste a:not(.btn) {
+    color: var(--brand-highlight) !important;
+    text-decoration: underline;
+}
+
+body.alto-contraste .btn-search,
+body.alto-contraste .btn-outline-primary:hover,
+body.alto-contraste .btn-outline-acessibility:hover,
+body.alto-contraste .btn-outline-secondary:hover {
+    background-color: var(--brand-highlight);
+    color: #000000;
+    font-weight: bold;
+}
+
+body.alto-contraste .btn-outline-primary,
+body.alto-contraste .btn-outline-acessibility,
+body.alto-contraste .btn-outline-secondary,
+body.alto-contraste .btn-light {
+    color: var(--brand-highlight);
+    border-color: var(--brand-highlight);
+    background-color: transparent;
+}
+
+body.alto-contraste .badge {
+    background-color: transparent !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--border-light);
+}
+
+body.alto-contraste .shadow-sm { box-shadow: none !important; }
+body.alto-contraste img.hero-img { filter: grayscale(100%) invert(100%); } /* Inverte cores da imagem para não ofuscar */
+/* ========================================================== */
+
+/* Estilos Gerais (sem alteração) */
+.navbar, .search-bar-modern { background: var(--surface-color); }
+.hero-section { background-color: var(--surface-color); }
+.hero-subtitle { color: var(--text-muted); }
+.bg-soft-orange { background-color: var(--soft-highlight); }
+.card-premium, .card-book { background-color: var(--surface-color); border-radius: 16px; transition: 0.2s ease; border: 1px solid transparent;}
+.card-book:hover { transform: translateY(-4px); border-color: var(--border-light); }
+.btn-search { background-color: var(--text-main); color: var(--surface-color); }
+.chart-wrapper { position: relative; height: 280px; width: 100%; }
+.logo-text { color: var(--text-main); }
+.text-orange { color: var(--brand-highlight); }
+.btn-outline-acessibility { border-color: #ced4da; color: #6c757d; }
+.btn-outline-acessibility:hover { background-color: #f1f3f5; }
