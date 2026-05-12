@@ -3,27 +3,25 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Biblioteca Inteligente</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>Análise de Dados | Biblioteca Inteligente</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=9">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 </head>
-<body id="conteudo-principal">
+<body id="conteudo-principal" class="transition-tema">
 
-  <nav class="navbar navbar-expand-lg py-3 shadow-sm bg-white">
+  <!-- NAVBAR PADRONIZADA COM TODOS OS BOTÕES -->
+  <nav class="navbar navbar-expand-lg py-3 shadow-sm bg-white mb-4">
     <div class="container">
       <a class="navbar-brand fw-bolder logo-text" href="{% url 'index' %}">EMEF Gianfrancesco Guarnieri</a>
       <div class="ms-auto d-flex align-items-center gap-3">
-        <a href="{% url 'index' %}" class="btn btn-outline-secondary rounded-pill btn-sm">Voltar ao Acervo</a>
+        <a href="{% url 'index' %}" class="btn btn-outline-secondary rounded-pill btn-sm">← Voltar ao Acervo</a>
         <div class="vr"></div>
         <div class="acessibilidade-panel d-flex gap-2">
             <button id="btn-contraste" class="btn btn-outline-acessibility rounded-pill btn-sm">🌓 Alto Contraste</button>
-            <button id="btn-leitura" class="btn btn-outline-acessibility rounded-pill btn-sm" aria-label="Ativar leitor de conteúdo">🔊 Ouvir</button>
+            <button id="btn-leitura" class="btn btn-outline-acessibility rounded-pill btn-sm">🔊 Ouvir</button>
             <button id="btn-parar-leitura" class="btn btn-danger rounded-pill btn-sm" style="display: none;">⏹️ Parar</button>
         </div>
       </div>
@@ -31,12 +29,59 @@
   </nav>
 
   <section class="container my-5">
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div><h3 class="fw-bold mb-1">Dashboard Analítico</h3><p class="text-muted small">Visão estratégica do acervo da biblioteca</p></div>
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Painel Gerencial de Leitura</h2>
+        <p class="text-muted">Análise de engajamento e fluxo de livros da escola</p>
     </div>
+
+    <!-- CARDS DE MÉTRICAS PROFUNDAS (SEM !IMPORTANT INLINE) -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-2 col-6">
+            <div class="card p-3 text-center h-100" style="border-bottom: 4px solid var(--text-muted);">
+                <p class="text-muted small fw-bold mb-1">Acervo Físico</p>
+                <h2 class="fw-bolder">{{ total_livros }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 text-center h-100" style="border-bottom: 4px solid #6f42c1;">
+                <p class="text-muted small fw-bold mb-1">Histórico Total de Empréstimos</p>
+                <h2 class="fw-bolder text-purple" style="color: #6f42c1;">{{ total_historico }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 text-center h-100" style="border-bottom: 4px solid #198754;">
+                <p class="text-muted small fw-bold mb-1">Livros Já Devolvidos</p>
+                <h2 class="fw-bolder text-success">{{ livros_devolvidos }}</h2>
+            </div>
+        </div>
+        <div class="col-md-2 col-6">
+            <div class="card p-3 text-center h-100" style="border-bottom: 4px solid #0d6efd;">
+                <p class="text-muted small fw-bold mb-1">Lendo Agora</p>
+                <h2 class="fw-bolder text-primary">{{ emprestimos_ativos }}</h2>
+            </div>
+        </div>
+        <div class="col-md-2 col-12">
+            <div class="card p-3 text-center h-100" style="border-bottom: 4px solid #ffc107;">
+                <p class="text-muted small fw-bold mb-1">Pendentes (Fila)</p>
+                <h2 class="fw-bolder text-warning">{{ aguardando_aprovacao }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- ... (O RESTANTE DA PÁGINA COM OS GRÁFICOS CONTINUA IGUAL) ... -->
     <div class="row g-4">
-      <div class="col-lg-6"><div class="card card-premium h-100 p-4 border-0 shadow-sm"><h6 class="fw-bold text-dark mb-1">Concentração do Acervo por Gênero</h6><p class="text-muted small mb-4">Distribuição ordenada dos gêneros literários</p><div class="chart-wrapper"><canvas id="graficoGeneros"></canvas></div></div></div>
-      <div class="col-lg-6"><div class="card card-premium h-100 p-4 border-0 shadow-sm"><h6 class="fw-bold text-dark mb-1">Top 5 Títulos Mais Emprestados</h6><p class="text-muted small mb-4">O título mais requisitado em destaque</p><div class="chart-wrapper"><canvas id="graficoEmprestimos"></canvas></div></div></div>
+      <div class="col-lg-6">
+          <div class="card h-100 p-4">
+              <h5 class="fw-bold mb-1">Concentração por Gênero</h5>
+              <div class="chart-wrapper"><canvas id="graficoGeneros"></canvas></div>
+          </div>
+      </div>
+      <div class="col-lg-6">
+          <div class="card h-100 p-4">
+              <h5 class="fw-bold mb-1">Top 5 Livros</h5>
+              <div class="chart-wrapper"><canvas id="graficoEmprestimos"></canvas></div>
+          </div>
+      </div>
     </div>
   </section>
 
@@ -46,6 +91,6 @@
     const labelsEmprestimos = {{ labels_emprestimos|safe }};
     const dadosEmprestimos = {{ dados_emprestimos|safe }};
   </script>
-  <script src="{% static 'js/script.js' %}?v=9"></script>
+  <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

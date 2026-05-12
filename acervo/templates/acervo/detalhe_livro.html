@@ -44,32 +44,58 @@
           <hr class="my-4">
 
           <!-- ============================================= -->
-          <!--      NOVA SEÇÃO DE CONTROLE DE EMPRÉSTIMO     -->
+          <!-- SEÇÃO DE CONTROLE DE EMPRÉSTIMO INTELIGENTE   -->
           <!-- ============================================= -->
           <div>
             <h5 class="fw-bold mb-3">Status do Livro</h5>
 
             {% if emprestimo_ativo %}
-              <!-- SE O LIVRO ESTIVER EMPRESTADO -->
-              <div class="alert alert-warning">
-                <p class="mb-1"><strong>Status:</strong> Emprestado</p>
-                <p class="mb-1"><strong>Retirado por:</strong> {{ emprestimo_ativo.usuario.username }}</p>
-                <p class="mb-0"><strong>Devolução até:</strong> {{ emprestimo_ativo.data_devolucao|date:"d/m/Y" }}</p>
-              </div>
-              <form action="{% url 'registrar_devolucao' emprestimo_ativo.id %}" method="POST" class="d-grid">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success btn-lg">Registrar Devolução</button>
-              </form>
+                
+                {% if not emprestimo_ativo.aprovado %}
+                    <!-- STATUS 1: SOLICITADO, AGUARDANDO ADMIN -->
+                    <div class="alert alert-warning">
+                        <p class="mb-1"><strong>Status:</strong> Aguardando liberação na biblioteca</p>
+                        <p class="mb-0"><strong>Solicitado por:</strong> {{ emprestimo_ativo.usuario.username }}</p>
+                    </div>
+                    
+                    {% if user.is_staff %}
+                        <!-- SÓ O ADMIN VÊ ESSE BOTÃO -->
+                        <form action="{% url 'aprovar_emprestimo' emprestimo_ativo.id %}" method="POST" class="d-grid">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-lg">Aprovar Retirada do Livro</button>
+                        </form>
+                    {% endif %}
+
+                {% else %}
+                    <!-- STATUS 2: EMPRESTADO DE FATO -->
+                    <div class="alert alert-info">
+                        <p class="mb-1"><strong>Status:</strong> Emprestado para {{ emprestimo_ativo.usuario.username }}</p>
+                        <p class="mb-0"><strong>Devolver até:</strong> {{ emprestimo_ativo.data_devolucao|date:"d/m/Y" }}</p>
+                    </div>
+
+                    {% if user.is_staff %}
+                        <!-- SÓ O ADMIN VÊ ESSE BOTÃO -->
+                        <form action="{% url 'registrar_devolucao' emprestimo_ativo.id %}" method="POST" class="d-grid">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-lg">Registrar Devolução</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
 
             {% else %}
-              <!-- SE O LIVRO ESTIVER DISPONÍVEL -->
-              <div class="alert alert-success">
-                <p class="mb-0"><strong>Status:</strong> Disponível para empréstimo</p>
-              </div>
-              <form action="{% url 'registrar_emprestimo' livro.id %}" method="POST" class="d-grid">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary btn-lg">Registrar Empréstimo</button>
-              </form>
+                <!-- STATUS 3: DISPONÍVEL -->
+                <div class="alert alert-success">
+                    <p class="mb-0"><strong>Status:</strong> Disponível no acervo</p>
+                </div>
+                
+                {% if user.is_authenticated %}
+                    <form action="{% url 'registrar_emprestimo' livro.id %}" method="POST" class="d-grid">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-search btn-lg">Solicitar Empréstimo</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary d-block w-100 text-center">Faça login para solicitar este livro</a>
+                {% endif %}
             {% endif %}
 
           </div>

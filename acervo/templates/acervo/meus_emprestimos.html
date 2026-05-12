@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Meus Livros | EMEF Gianfrancesco Guarnieri</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body id="conteudo-principal" class="transition-tema">
+
+  <!-- A classe bg-white foi removida para que o CSS de alto contraste possa agir livremente -->
+  <nav class="navbar navbar-expand-lg py-3 shadow-sm mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bolder logo-text" href="{% url 'index' %}">EMEF Gianfrancesco Guarnieri</a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <a href="{% url 'index' %}" class="btn btn-outline-secondary rounded-pill btn-sm">← Voltar ao Acervo</a>
+        <div class="vr"></div>
+        <div class="acessibilidade-panel d-flex gap-2">
+            <button id="btn-contraste" class="btn btn-outline-acessibility rounded-pill btn-sm">🌓 Alto Contraste</button>
+            <button id="btn-leitura" class="btn btn-outline-acessibility rounded-pill btn-sm">🔊 Ouvir</button>
+            <button id="btn-parar-leitura" class="btn btn-danger rounded-pill btn-sm" style="display: none;">⏹️ Parar</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mb-5">
+    <h3 class="fw-bold mb-4">Meu Histórico de Leituras</h3>
+    
+    <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Livro</th>
+              <th>Data da Solicitação</th>
+              <th>Status</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in historico %}
+            <tr>
+              <td class="fw-bold">{{ item.livro.titulo }}</td>
+              <td>{{ item.data_emprestimo|date:"d/m/Y" }}</td>
+              <td>
+                {% if item.devolvido %}
+                    <span class="badge bg-success text-white border-0">Devolvido</span>
+                {% elif not item.aprovado %}
+                    <span class="badge bg-warning text-dark border-0">Aguardando Aprovação</span>
+                {% else %}
+                    <span class="badge bg-primary text-white border-0">Lendo (No Prazo)</span>
+                {% endif %}
+              </td>
+              <td><a href="{% url 'detalhe_livro' item.livro.id %}" class="btn btn-sm btn-outline-secondary">Ver Livro</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center py-4 text-muted">Você ainda não solicitou nenhum livro.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

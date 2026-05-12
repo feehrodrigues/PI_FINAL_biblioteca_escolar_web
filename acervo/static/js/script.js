@@ -1,149 +1,110 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // LÓGICA DE ALTO CONTRASTE PERSISTENTE
+    const formatarTextoEmLinhas = (texto, maxCharsPorLinha = 15) => {
+        const palavras = texto.split(' ');
+        let linhas = [], linhaAtual = '';
+        palavras.forEach(palavra => {
+            if ((linhaAtual + palavra).length > maxCharsPorLinha) {
+                if (linhaAtual) linhas.push(linhaAtual.trim());
+                linhaAtual = palavra + ' ';
+            } else { linhaAtual += palavra + ' '; }
+        });
+        if (linhaAtual) linhas.push(linhaAtual.trim());
+        if (linhas.length > 3) linhas = [linhas[0], linhas[1], linhas[2] + '...'];
+        return linhas;
+    };
+
     const btnContraste = document.getElementById('btn-contraste');
     const body = document.body;
 
-    // Verifica no localStorage se o modo de alto contraste já estava ativo
+    // Recupera o tema salvo ANTES de desenhar os gráficos
     if (localStorage.getItem('altoContraste') === 'ativado') {
         body.classList.add('alto-contraste');
     }
 
+    // Função que força a cor dos textos do gráfico
+    const atualizarCoresGraficos = () => {
+        if (typeof Chart === 'undefined') return;
+        const isHC = body.classList.contains('alto-contraste');
+        const corTexto = isHC ? '#ffffff' : '#64748b'; 
+        
+        Chart.instances.forEach(chart => {
+            if (chart.options.scales.x && chart.options.scales.x.ticks) {
+                chart.options.scales.x.ticks.color = corTexto;
+            }
+            if (chart.options.scales.y && chart.options.scales.y.ticks) {
+                chart.options.scales.y.ticks.color = corTexto;
+            }
+            if (chart.options.plugins.datalabels) {
+                chart.options.plugins.datalabels.color = corTexto;
+            }
+            chart.update();
+        });
+    };
+
+    // Evento de clique no botão
     if (btnContraste) {
         btnContraste.addEventListener('click', () => {
             body.classList.toggle('alto-contraste');
-            // Salva a preferência do usuário no localStorage
-            if (body.classList.contains('alto-contraste')) {
-                localStorage.setItem('altoContraste', 'ativado');
-            } else {
-                localStorage.setItem('altoContraste', 'desativado');
-            }
+            localStorage.setItem('altoContraste', body.classList.contains('alto-contraste') ? 'ativado' : 'desativado');
+            atualizarCoresGraficos(); 
         });
     }
 
-    // LÓGICA DO DASHBOARD
-    const ctxGeneros = document.getElementById('graficoGeneros');
-    if (ctxGeneros) {
+    // DESENHO DOS GRÁFICOS DO DASHBOARD
+    if (document.getElementById('graficoGeneros')) {
         Chart.register(ChartDataLabels);
         Chart.defaults.font.family = "'Inter', sans-serif";
         
-        const getChartColors = () => {
-            const isHighContrast = body.classList.contains('alto-contraste');
-            return {
-                corDestaque: getComputedStyle(document.documentElement).getPropertyValue('--brand-highlight').trim(),
-                corNeutra: getComputedStyle(document.documentElement).getPropertyValue('--border-light').trim(),
-                corTexto: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim(),
-                corTextoDestaque: isHighContrast ? '#000000' : '#FFFFFF',
-            };
-        };
+        // Define a cor de início baseada no que está no Body AGORA
+        const corTextoInicial = body.classList.contains('alto-contraste') ? '#ffffff' : '#64748b';
 
-        const colors = getChartColors();
-        Chart.defaults.color = colors.corTexto;
-
-        new Chart(ctxGeneros.getContext('2d'), { 
+        new Chart(document.getElementById('graficoGeneros').getContext('2d'), { 
             type: 'bar', 
-            data: { 
-                labels: labelsGeneros, 
-                datasets:[{ 
-                    data: dadosGeneros, 
-                    backgroundColor: labelsGeneros.map((_, i) => i === 0 ? colors.corDestaque : colors.corNeutra), 
-                    borderRadius: 4, 
-                    borderSkipped: false 
-                }] 
-            }, 
+            data: { labels: labelsGeneros, datasets:[{ data: dadosGeneros, backgroundColor: '#f97316', borderRadius: 6, barThickness: 20 }] }, 
             options: { 
-                indexAxis: 'y', 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { display: false }, 
-                    datalabels: { 
-                        color: (context) => context.dataIndex === 0 ? colors.corTextoDestaque : colors.corTexto, 
-                        anchor: 'end', 
-                        align: 'start', 
-                        offset: 10, 
-                        font: { weight: 'bold' } 
-                    } 
-                }, 
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 30 } },
+                plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'end', offset: 4, font: { weight: 'bold' }, color: corTextoInicial } }, 
                 scales: { 
-                    x: { display: false, beginAtZero: true }, 
-                    y: { grid: { display: false }, border: { display: false } } 
+                    x: { display: false }, 
+                    y: { border: { display: false }, grid: { display: false }, ticks: { color: corTextoInicial, font: { weight: 'bold' } } } 
                 } 
             } 
         });
 
-        const ctxEmprestimos = document.getElementById('graficoEmprestimos');
-        new Chart(ctxEmprestimos.getContext('2d'), { 
+        new Chart(document.getElementById('graficoEmprestimos').getContext('2d'), { 
             type: 'bar', 
-            data: { 
-                labels: labelsEmprestimos, 
-                datasets:[{ 
-                    data: dadosEmprestimos, 
-                    backgroundColor: labelsEmprestimos.map((_, i) => i === 0 ? colors.corDestaque : colors.corNeutra), 
-                    borderRadius: { topLeft: 6, topRight: 6 }, 
-                    borderSkipped: false 
-                }] 
-            }, 
+            data: { labels: labelsEmprestimos.map(label => formatarTextoEmLinhas(label, 20)), datasets:[{ data: dadosEmprestimos, backgroundColor: ['#0d6efd', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'], borderRadius: 6, barThickness: 25 }] }, 
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { display: false }, 
-                    datalabels: { 
-                        color: (context) => context.dataIndex === 0 ? colors.corTextoDestaque : colors.corTexto, 
-                        anchor: 'end', 
-                        align: 'start', 
-                        offset: -20, 
-                        font: { weight: 'bold' } 
-                    } 
-                }, 
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 30 } },
+                plugins: { legend: { display: false }, tooltip: { callbacks: { title: (ctx) => labelsEmprestimos[ctx[0].dataIndex] } }, datalabels: { anchor: 'end', align: 'end', offset: 4, font: { weight: 'bold' }, color: corTextoInicial } }, 
                 scales: { 
-                    x: { grid: { display: false }, border: { display: false } }, 
-                    y: { display: false, beginAtZero: true } 
+                    x: { display: false }, 
+                    y: { border: { display: false }, grid: { display: false }, ticks: { color: corTextoInicial, font: { weight: 'bold' } } } 
                 } 
             } 
         });
     }
 
-    // LEITOR DE CONTEÚDO ACESSÍVEL USANDO API NATIVA DO NAVEGADOR
+    // LEITOR DE TELA (ACESSIBILIDADE)
     const btnLeitura = document.getElementById('btn-leitura');
     const btnPararLeitura = document.getElementById('btn-parar-leitura');
-    const synth = window.speechSynthesis;
-    let utterance;
-
-    if (btnLeitura && btnPararLeitura && synth) {
-        const AcoesLeitura = {
-            iniciar: () => {
-                const conteudo = document.getElementById('conteudo-principal').innerText;
-                if (synth.speaking) {
-                    synth.cancel();
-                }
-                if (conteudo) {
-                    utterance = new SpeechSynthesisUtterance(conteudo);
-                    utterance.lang = 'pt-BR';
-                    utterance.onstart = () => {
-                        btnLeitura.style.display = 'none';
-                        btnPararLeitura.style.display = 'inline-block';
-                    };
-                    utterance.onend = () => {
-                        btnLeitura.style.display = 'inline-block';
-                        btnPararLeitura.style.display = 'none';
-                    };
-                    utterance.onerror = () => {
-                        console.error('Ocorreu um erro na síntese de fala.');
-                        AcoesLeitura.parar();
-                    };
-                    synth.speak(utterance);
-                }
-            },
-            parar: () => {
-                synth.cancel();
-                btnLeitura.style.display = 'inline-block';
-                btnPararLeitura.style.display = 'none';
-            }
-        };
-
-        btnLeitura.addEventListener('click', AcoesLeitura.iniciar);
-        btnPararLeitura.addEventListener('click', AcoesLeitura.parar);
+    if (btnLeitura && btnPararLeitura && window.speechSynthesis) {
+        btnLeitura.addEventListener('click', () => {
+            const container = document.getElementById('conteudo-principal');
+            if (!container) return;
+            const texto = container.innerText;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(texto);
+            utterance.lang = 'pt-BR';
+            utterance.onstart = () => { btnLeitura.style.display = 'none'; btnPararLeitura.style.display = 'inline-block'; };
+            utterance.onend = () => { btnLeitura.style.display = 'inline-block'; btnPararLeitura.style.display = 'none'; };
+            window.speechSynthesis.speak(utterance);
+        });
+        btnPararLeitura.addEventListener('click', () => {
+            window.speechSynthesis.cancel();
+            btnLeitura.style.display = 'inline-block';
+            btnPararLeitura.style.display = 'none';
+        });
     }
 });
